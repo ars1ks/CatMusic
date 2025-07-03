@@ -1,0 +1,53 @@
+# Игнорировать собранные бинарные файлы
+*.exe
+*.out
+*.app
+*.so
+*.dll
+*.a
+*.lib
+
+# Игнорировать объектные файлы и промежуточные файлы компиляции
+*.o
+*.obj
+*.gcno
+*.gcda
+
+# Игнорировать отладочные символы
+*.dSYM/
+*.pdb
+*.ilk
+
+# Игнорировать папки сборки (CMake, Make, Ninja и т. д.)
+build/
+out/
+bin/
+Debug/
+Release/
+x64/
+x86/
+
+# Игнорировать кэш CMake и временные файлы
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Игнорировать файлы IDE (Visual Studio, CLion, Qt Creator и т. д.)
+.vs/
+.idea/
+*.user
+*.sln
+*.vcxproj*
+*.vcproj*
+*.suo
+*.ncb
+
+# Игнорировать логи и временные файлы
+*.log
+*.tmp
+
+# Игнорировать зависимости (если они скачиваются автоматически)
+deps/
+third_party/
