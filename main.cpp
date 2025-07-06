@@ -7,7 +7,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-// Иконки FontAwesome
 #define ICON_FA_PLAY u8"\u25B6"
 #define ICON_FA_PAUSE u8"\u23F8"
 #define ICON_FA_STEP_BACKWARD u8"\u23EE"
@@ -47,7 +46,6 @@ int main() {
     ImGuiStyle& style = ImGui::GetStyle();
     style.Alpha = 1.0f;
     
-    // Светлая цветовая схема без прозрачности
     ImGui::StyleColorsLight();
     style.Colors[ImGuiCol_WindowBg] = ImVec4(0.95f, 0.95f, 0.96f, 1.00f);
     style.Colors[ImGuiCol_ChildBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
@@ -67,7 +65,6 @@ int main() {
     style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.92f, 0.92f, 0.94f, 1.00f);
     style.Colors[ImGuiCol_CheckMark] = ImVec4(0.30f, 0.60f, 0.90f, 1.00f);
     
-    // Убираем закругления
     style.WindowRounding = 0.0f;
     style.ChildRounding = 0.0f;
     style.FrameRounding = 0.0f;
@@ -76,7 +73,6 @@ int main() {
     style.ScrollbarRounding = 0.0f;
     style.FrameBorderSize = 0.0f;
     
-    // Уменьшаем отступы
     style.WindowPadding = ImVec2(8, 8);
     style.FramePadding = ImVec2(8, 4);
     style.ItemSpacing = ImVec2(8, 6);
@@ -134,41 +130,22 @@ int main() {
         
         windowHovered = ImGui::IsWindowHovered();
 
-        // Заголовок приложения
         ImGui::SetCursorPos(ImVec2(20, 15));
         ImGui::PushFont(titleFont);
         ImGui::Text("CatMp3");
         ImGui::PopFont();
 
-        // Основной контент
         ImGui::SetCursorPos(ImVec2(15, 60));
         ImGui::BeginGroup();
 
-        // Левая панель (плейлисты)
         ImGui::BeginChild("LeftPanel", ImVec2(width * 0.22f, height - 80), true);
         {
-            // Заголовок
             ImGui::PushFont(mediumFont);
             ImGui::Text("Playlists");
             ImGui::PopFont();
             ImGui::Separator();
             
-            // Список плейлистов
-            // float availableHeight = ImGui::GetContentRegionAvail().y - ImGui::GetFrameHeightWithSpacing();
-            // ImGui::BeginChild("TrackList", ImVec2(-1, availableHeight), false);
-            // {
-            //     const char* playlists[] = {"Favorites", "Rock", "Pop", "Classical", "Chill", "Workout", 
-            //                              "Focus", "Relax", "Electronic", "Jazz", "Blues", "Metal", 
-            //                              "Indie", "Hip Hop", "R&B", "Soundtracks"};
-            //     for (int i = 0; i < IM_ARRAYSIZE(playlists); i++) {
-            //         ImGui::Selectable(playlists[i], i == 0);
-            //     }
-            // }
-            // ImGui::EndChild();
-
-            // Кнопка добавления
             if (ImGui::Button(ICON_FA_PLUS " Add Playlist", ImVec2(-1, 0))) {
-                // Добавление плейлиста
             }
         }
         ImGui::EndChild();
@@ -176,26 +153,21 @@ int main() {
         ImGui::EndGroup();
         ImGui::SameLine();
 
-        // Правая колонка
         ImGui::BeginGroup();
         {
-            // Панель с обложкой и информацией
             ImGui::BeginChild("MainPanel", ImVec2(0, 380), true);
             {   
-                // Обложка альбома
                 const float cover_size = 200.0f;
                 ImVec2 center_pos = ImVec2(
                     (ImGui::GetContentRegionAvail().x - cover_size) * 0.5f,
                     (ImGui::GetContentRegionAvail().y - cover_size - 80) * 0.3f
                 );
                 
-              
                 ImGui::SetCursorPos(center_pos);
                 ImDrawList* draw_list = ImGui::GetWindowDrawList();
                 ImVec2 p0 = ImGui::GetCursorScreenPos();
                 ImVec2 p1 = ImVec2(p0.x + cover_size, p0.y + cover_size);
                 draw_list->AddRectFilled(p0, p1, IM_COL32(230, 230, 230, 255));
-                
                 
                 ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - 200) * 0.6f);
                 ImGui::SetCursorPosY(center_pos.y + cover_size + 30);
@@ -206,13 +178,11 @@ int main() {
                 ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - 150) * 0.5f);
                 ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "Ya ystal");
                 
-             
                 ImGui::SetCursorPosX(30);
                 ImGui::SetCursorPosY(center_pos.y + cover_size + 70);
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 60);
                 ImGui::SliderFloat("##progress", &progress, 0.0f, 1.0f, "");
                 
-                // Время трека
                 ImGui::SetCursorPosX(30);
                 ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "2:45");
                 ImGui::SameLine();
@@ -221,11 +191,9 @@ int main() {
             }
             ImGui::EndChild();
 
-            // Нижняя панель (управление)
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
             ImGui::BeginChild("SwitchingArea", ImVec2(0, 90), true);
             {
-                // Центрируем кнопки управления
                 float buttonWidth = 50.0f;
                 float playButtonWidth = 60.0f;
                 float buttonHeight = 50.0f;
@@ -235,41 +203,34 @@ int main() {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
                 ImGui::SetCursorPosX(startX);
                 
-                // Кнопка "Назад"
                 if (ImGui::Button(ICON_FA_STEP_BACKWARD, ImVec2(buttonWidth, buttonHeight))) {
-                    // Предыдущий трек
                 }
                 
                 ImGui::SameLine();
                 
-                // Кнопка "Play/Pause"
                 if (ImGui::Button(isPlaying ? ICON_FA_PAUSE : ICON_FA_PLAY, ImVec2(playButtonWidth, playButtonWidth))) {
                     isPlaying = !isPlaying;
                 }
                 
                 ImGui::SameLine();
                 
-                // Кнопка "Вперед"
                 if (ImGui::Button(ICON_FA_STEP_FORWARD, ImVec2(buttonWidth, buttonHeight))) {
-                    // Следующий трек
                 }
             }
             ImGui::EndChild();
         }
         ImGui::EndGroup();
 
-        ImGui::End(); // Главное окно
+        ImGui::End();
 
-        // Рендеринг
         ImGui::Render();
         glViewport(0, 0, width, height);
-        glClearColor(0.95f, 0.95f, 0.96f, 1.0f); // Светло-серый фон
+        glClearColor(0.95f, 0.95f, 0.96f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
     }
 
-    // Очистка
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
