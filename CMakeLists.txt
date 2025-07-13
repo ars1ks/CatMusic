@@ -12,6 +12,7 @@ find_package(GLEW REQUIRED)
 include_directories(
     ${CMAKE_SOURCE_DIR}/imgui
     ${CMAKE_SOURCE_DIR}/imgui/backends
+    ${CMAKE_SOURCE_DIR}/thirdparty/tinyfiledialogs  # Добавлено
 )
 
 # Исходные файлы ImGui
@@ -19,6 +20,11 @@ file(GLOB IMGUI_SOURCES
     "imgui/*.cpp"
     "imgui/backends/imgui_impl_glfw.cpp"
     "imgui/backends/imgui_impl_opengl3.cpp"
+)
+
+# Добавляем tinyfiledialogs как статическую библиотеку
+add_library(tinyfiledialogs STATIC
+    "thirdparty/tinyfiledialogs/tinyfiledialogs.c"
 )
 
 # Основной исполняемый файл
@@ -29,6 +35,7 @@ target_link_libraries(app
     glfw
     ${OPENGL_LIBRARIES}
     GLEW::GLEW
+    tinyfiledialogs  # Добавлено
 )
 
 # Настройки компиляции

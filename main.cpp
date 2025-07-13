@@ -3,9 +3,10 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 #include <cmath>
-
+#include <string>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "tinyfiledialogs.h"
 
 #define ICON_FA_PLAY u8"\u25B6"
 #define ICON_FA_PAUSE u8"\u23F8"
@@ -21,7 +22,7 @@
 int main() {
     if (!glfwInit()) return 1;
     
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
     glfwWindowHint(GLFW_SAMPLES, 4);
     
     GLFWwindow* window = glfwCreateWindow(900, 580, "CatMp3", NULL, NULL);
@@ -35,10 +36,10 @@ int main() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     
-    ImFont* mainFont = io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 16.0f);
-    ImFont* mediumFont = io.Fonts->AddFontFromFileTTF("Roboto-Medium.ttf", 18.0f);
-    ImFont* boldFont = io.Fonts->AddFontFromFileTTF("Roboto-Bold.ttf", 24.0f);
-    ImFont* titleFont = io.Fonts->AddFontFromFileTTF("Roboto-Bold.ttf", 32.0f);
+    ImFont* mainFont = io.Fonts->AddFontFromFileTTF("Manrope-Regular.ttf", 16.0f);
+    ImFont* mediumFont = io.Fonts->AddFontFromFileTTF("Manrope-Medium.ttf", 18.0f);
+    ImFont* boldFont = io.Fonts->AddFontFromFileTTF("Manrope-Bold.ttf", 24.0f);
+    ImFont* titleFont = io.Fonts->AddFontFromFileTTF("Manrope-ExtraBold.ttf", 32.0f);
     
     io.Fonts->Build();
     io.FontDefault = mainFont;
@@ -146,6 +147,14 @@ int main() {
             ImGui::Separator();
             
             if (ImGui::Button(ICON_FA_PLUS " Add Playlist", ImVec2(-1, 0))) {
+                const char* folderPath = tinyfd_selectFolderDialog(
+                    "kkkk",
+                    nullptr
+                );
+                if(folderPath){
+                    static std::string selectedFolder;
+                    selectedFolder = folderPath;
+                }
             }
         }
         ImGui::EndChild();
