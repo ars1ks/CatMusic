@@ -15,7 +15,6 @@
 #include <cstdint>
 namespace fs = std::filesystem;
 
-// Убедимся, что ImTextureID совместим с GLuint
 static_assert(sizeof(ImTextureID) >= sizeof(GLuint), "ImTextureID too small for GLuint");
 
 GLuint LoadTextureFromFile(const char* filename) {
@@ -45,7 +44,6 @@ struct IconTextures {
     GLuint next;
 } icons;
 
-// Структура для темы
 struct CustomTheme {
     ImVec4 windowBg;
     ImVec4 childBg;
@@ -162,7 +160,7 @@ void ShowThemeEditor(CustomTheme& theme) {
     }
 }
 
-void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& image_size,  GLuint play, GLuint nazad, GLuint vpered) {
+void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& image_size, GLuint play, GLuint nazad, GLuint vpered) {
     static bool isPlaying = false;
     static float progress = 0.65f;
     static std::vector<std::string> loadedFiles;
@@ -182,24 +180,21 @@ void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& imag
         ImGuiWindowFlags_NoCollapse
     );
 
-    // Кнопка настроек темы
-    ImGui::SetCursorPos(ImVec2(windowSize.x - 120, 15));
-    ShowThemeEditor(theme);
-
+    // Header with title and settings
     ImGui::SetCursorPos(ImVec2(20, 15));
     ImGui::TextColored(theme.accent, "CatMp3");
+    ImGui::SameLine(windowSize.x - 120);
+    ShowThemeEditor(theme);
 
+    // Left panel (playlists)
     ImGui::SetCursorPos(ImVec2(15, 60));
-    ImGui::BeginGroup();
-
-    // Левая панель (плейлисты)
     ImGui::BeginChild("LeftPanel", ImVec2(windowSize.x * 0.20f, windowSize.y - 80), true);
     {
         ImGui::TextColored(theme.accent, "Playlists");
         ImGui::Separator();
         
         if (showLoadedFiles) {
-            ImGui::BeginChild("File List", ImVec2(0, 300), true);
+            ImGui::BeginChild("File List", ImVec2(0, ImGui::GetContentRegionAvail().y - 40), true);
             for (const auto& file : loadedFiles) {
                 ImGui::Selectable(file.c_str(), false);
             }
@@ -222,14 +217,13 @@ void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& imag
     }
     ImGui::EndChild();
     
-    ImGui::EndGroup();
     ImGui::SameLine();
 
-    // Правая панель (плеер)
+    // Right panel (player)
     ImGui::BeginGroup();
     {
-        // Область с обложкой
-        ImGui::BeginChild("MainPanel", ImVec2(0, 380), true);
+        // Album cover area
+        ImGui::BeginChild("MainPanel", ImVec2(0, windowSize.y - 180), true);
         {   
             const float cover_size = 200.0f;
             ImVec2 center_pos = ImVec2(
@@ -237,69 +231,89 @@ void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& imag
                 (ImGui::GetContentRegionAvail().y - cover_size - 80) * 0.3f
             );
             
-            // Обложка альбома
+            // Album cover
             ImGui::SetCursorPos(center_pos);
             
-             if (my_texture != 0) {
-            // КОРРЕКТНОЕ приведение типов:
-            ImTextureID tex_id = (ImTextureID)(intptr_t)my_texture;
-            ImGui::Image(tex_id, image_size);
-        } else {
-            ImGui::TextColored(ImVec4(1,0,0,1), "Texture not loaded!");
-        }
-        
+            if (my_texture != 0) {
+                ImTextureID tex_id = (ImTextureID)(intptr_t)my_texture;
+                ImGui::Image(tex_id, image_size);
+            } else {
+                ImGui::TextColored(ImVec4(1,0,0,1), "Texture not loaded!");
+            }
             
-            // Информация о треке
-            ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - 200) * 0.6f);
-            ImGui::SetCursorPosY(center_pos.y + cover_size + 30);
+            // Track info
+            ImVec2 text_pos = ImVec2(
+                (ImGui::GetContentRegionAvail().x - 200) * 0.5f,
+                center_pos.y + cover_size + 30
+            );
+            ImGui::SetCursorPos(text_pos);
+            //ImGui::Text("Now Playing");
+            ImGui::SetCursorPosX(text_pos.x);
+           // ImGui::Text("Artist - Track Name");
             
-            ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - 150) * 0.5f);
-            
+            // Progress bar
             ImGui::SetCursorPosX(30);
-            ImGui::SetCursorPosY(center_pos.y + cover_size + 70);
+            ImGui::SetCursorPosY(text_pos.y + 50);
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 60);
             ImGui::SliderFloat("##progress", &progress, 0.0f, 1.0f, "");
             
-            // Время трека
+            // Track time
             ImGui::SetCursorPosX(30);
             ImGui::Text("0:00");
             ImGui::SameLine();
             ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - 50);
-            ImGui::Text("0:00");
+            ImGui::Text("3:45");
         }
         ImGui::EndChild();
 
-        // Панель управления
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
-        ImGui::BeginChild("Controls", ImVec2(0, 105), true);
-        {
-            const float buttonWidth = 50.0f;
-            const float playButtonWidth = 60.0f;
-            const float buttonHeight = 50.0f;
-            const float totalWidth = buttonWidth * 2 + playButtonWidth + ImGui::GetStyle().ItemSpacing.x * 2;
-            const float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
-            
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
-            ImGui::SetCursorPosX(startX);
-            
-            ImTextureID tex_id_prev = (ImTextureID)(intptr_t)nazad;
-            if (IconButton("prev", tex_id_prev, ImVec2(buttonWidth, buttonHeight))) {
-                // Previous track
-            }
-            
-            ImGui::SameLine();
-            ImTextureID tex_id_play = (ImTextureID)(intptr_t)play;
-            if (IconButton("play", tex_id_play, ImVec2(playButtonWidth, playButtonWidth))) {
-                isPlaying = !isPlaying;
-            }
-            
-            ImGui::SameLine();
-             ImTextureID tex_id_vpered = (ImTextureID)(intptr_t)vpered;
-            if (IconButton("next", tex_id_vpered, ImVec2(buttonWidth, buttonHeight))) {
-                // Next track
-            }
-        }
-        ImGui::EndChild();
+        // Controls panel
+ImGui::BeginChild("Controls", ImVec2(0, 96), true);
+{
+    const float buttonWidth = 50.0f;
+    const float playButtonWidth = 60.0f;
+    const float buttonHeight = 50.0f;
+    
+    // Рассчитываем общую ширину всех элементов с учетом отступов
+    const float totalWidth = buttonWidth * 2 + playButtonWidth + ImGui::GetStyle().ItemSpacing.x * 2;
+    
+    // Получаем доступную ширину и вычисляем начальную позицию для центрирования
+    float availWidth = ImGui::GetContentRegionAvail().x;
+    float startX = (availWidth - totalWidth) * 0.5f;
+    
+    // Вычисляем вертикальную позицию для центрирования
+    float availHeight = ImGui::GetContentRegionAvail().y;
+    float startY = (availHeight - buttonHeight) * 0.5f;
+    
+    // Устанавливаем позицию для первой кнопки
+    ImGui::SetCursorPos(ImVec2(startX, startY));
+    
+    // Кнопка "Назад"
+    ImTextureID tex_id_prev = (ImTextureID)(intptr_t)nazad;
+    if (IconButton("prev", tex_id_prev, ImVec2(buttonWidth, buttonHeight))) {
+        // Previous track
+    }
+    
+    // Кнопка "Play/Pause"
+    ImGui::SameLine(0, ImGui::GetStyle().ItemSpacing.x);
+    ImTextureID tex_id_play = (ImTextureID)(intptr_t)play;
+    if (IconButton("play", tex_id_play, ImVec2(playButtonWidth, playButtonWidth))) {
+        isPlaying = !isPlaying;
+    }
+    
+    // Кнопка "Вперед"
+    ImGui::SameLine(0, ImGui::GetStyle().ItemSpacing.x);
+    ImTextureID tex_id_next = (ImTextureID)(intptr_t)vpered;
+    if (IconButton("next", tex_id_next, ImVec2(buttonWidth, buttonHeight))) {
+        // Next track
+    }
+    
+    // Добавим отладочную информацию для проверки выравнивания
+    if (ImGui::GetIO().KeyShift) {
+        ImGui::SetCursorPosY(startY + buttonHeight + 10);
+        ImGui::Text("Debug: availWidth=%.1f, startX=%.1f, totalWidth=%.1f", availWidth, startX, totalWidth);
+    }
+}
+ImGui::EndChild();
     }
     ImGui::EndGroup();
 
@@ -320,7 +334,7 @@ int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     
-    // Инициализация темы по умолчанию (Gruvbox)
+    // Default theme (Gruvbox)
     CustomTheme theme;
     theme.windowBg = HexToImVec4("#1d2021");
     theme.childBg = HexToImVec4("#282828");
@@ -338,15 +352,12 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
-
-
     GLuint my_texture = LoadTextureFromFile("example.jpg");
-    ImVec2 image_size(300.0f, 200.0f);
+    ImVec2 image_size(200.0f, 200.0f); // Square aspect ratio
 
     GLuint play = LoadTextureFromFile("play.png");
-    GLuint vpered = LoadTextureFromFile("vpered.png");
-    GLuint nazad = LoadTextureFromFile("nazad.png");
-
+    GLuint vpered = LoadTextureFromFile("nazad.png");
+    GLuint nazad = LoadTextureFromFile("vpered.png");
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -372,12 +383,11 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    // Очистка текстур
-    glDeleteTextures(1, &icons.play);
-    glDeleteTextures(1, &icons.pause);
-    glDeleteTextures(1, &icons.prev);
-    glDeleteTextures(1, &icons.next);
+    // Cleanup
     if (my_texture != 0) glDeleteTextures(1, &my_texture);
+    if (play != 0) glDeleteTextures(1, &play);
+    if (vpered != 0) glDeleteTextures(1, &vpered);
+    if (nazad != 0) glDeleteTextures(1, &nazad);
     
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
