@@ -162,7 +162,7 @@ void ShowThemeEditor(CustomTheme& theme) {
     }
 }
 
-void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& image_size) {
+void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& image_size,  GLuint play, GLuint nazad, GLuint vpered) {
     static bool isPlaying = false;
     static float progress = 0.65f;
     static std::vector<std::string> loadedFiles;
@@ -282,19 +282,20 @@ void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& imag
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15);
             ImGui::SetCursorPosX(startX);
             
-            if (IconButton("prev", icons.prev, ImVec2(buttonWidth, buttonHeight))) {
+            ImTextureID tex_id_prev = (ImTextureID)(intptr_t)nazad;
+            if (IconButton("prev", tex_id_prev, ImVec2(buttonWidth, buttonHeight))) {
                 // Previous track
             }
             
             ImGui::SameLine();
-            
-            if (IconButton("play", isPlaying ? icons.pause : icons.play, ImVec2(playButtonWidth, playButtonWidth))) {
+            ImTextureID tex_id_play = (ImTextureID)(intptr_t)play;
+            if (IconButton("play", tex_id_play, ImVec2(playButtonWidth, playButtonWidth))) {
                 isPlaying = !isPlaying;
             }
             
             ImGui::SameLine();
-            
-            if (IconButton("next", icons.next, ImVec2(buttonWidth, buttonHeight))) {
+             ImTextureID tex_id_vpered = (ImTextureID)(intptr_t)vpered;
+            if (IconButton("next", tex_id_vpered, ImVec2(buttonWidth, buttonHeight))) {
                 // Next track
             }
         }
@@ -342,6 +343,11 @@ int main() {
     GLuint my_texture = LoadTextureFromFile("example.jpg");
     ImVec2 image_size(300.0f, 200.0f);
 
+    GLuint play = LoadTextureFromFile("play.png");
+    GLuint vpered = LoadTextureFromFile("vpered.png");
+    GLuint nazad = LoadTextureFromFile("nazad.png");
+
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -349,7 +355,7 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ShowMainInterface(theme, my_texture, image_size);
+        ShowMainInterface(theme, my_texture, image_size, play, vpered, nazad);
 
         ImGui::Render();
         int display_w, display_h;
