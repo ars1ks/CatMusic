@@ -251,12 +251,30 @@ void ShowMainInterface(CustomTheme& theme, GLuint my_texture, const ImVec2& imag
             ImGui::SetCursorPosX(text_pos.x);
            // ImGui::Text("Artist - Track Name");
             
-            // Progress bar
-            ImGui::SetCursorPosX(30);
-            ImGui::SetCursorPosY(text_pos.y + 50);
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 60);
-            ImGui::SliderFloat("##progress", &progress, 0.0f, 1.0f, "");
-            
+static float wave[50];
+for (int i = 0; i < 50; i++) 
+    wave[i] = 0.2f + 0.8f * sinf(ImGui::GetTime() * 3.0f + i * 0.2f) * 0.5f;
+
+// Отрисовка
+ImDrawList* draw_list = ImGui::GetWindowDrawList();
+ImVec2 p = ImGui::GetCursorScreenPos();
+float width = ImGui::GetContentRegionAvail().x;
+
+for (int i = 0; i < 50; i++) {
+    float x = p.x + (width / 50.0f) * i;
+    float h = 15 * wave[i];
+    draw_list->AddRectFilled(
+        ImVec2(x, p.y + 10 - h),
+        ImVec2(x + (width / 50.0f) - 2, p.y + 10),
+        IM_COL32(100, 200, 255, 150)
+    );
+}
+
+// Прогресс-бар поверх волн
+ImGui::SetCursorScreenPos(p);
+ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(255, 255, 255, 50));
+ImGui::ProgressBar(progress, ImVec2(width, 20), "");
+ImGui::PopStyleColor();
             // Track time
             ImGui::SetCursorPosX(30);
             ImGui::Text("0:00");
@@ -306,12 +324,6 @@ ImGui::BeginChild("Controls", ImVec2(0, 96), true);
     if (IconButton("next", tex_id_next, ImVec2(buttonWidth, buttonHeight))) {
         // Next track
     }
-    
-    // Добавим отладочную информацию для проверки выравнивания
-    if (ImGui::GetIO().KeyShift) {
-        ImGui::SetCursorPosY(startY + buttonHeight + 10);
-        ImGui::Text("Debug: availWidth=%.1f, startX=%.1f, totalWidth=%.1f", availWidth, startX, totalWidth);
-    }
 }
 ImGui::EndChild();
     }
@@ -358,6 +370,8 @@ int main() {
     GLuint play = LoadTextureFromFile("play.png");
     GLuint vpered = LoadTextureFromFile("nazad.png");
     GLuint nazad = LoadTextureFromFile("vpered.png");
+
+
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
